@@ -1,5 +1,5 @@
 create table preferences (
-    id_task int(11) NOT NULL AUTO_INCREMENT,
+    id_task int(11) NOT NULL ,
 	acc_id int(11) NOT NULL ,
 	8_10 varchar(20) NOT NULL ,
     10_12 varchar(20) NOT NULL ,
