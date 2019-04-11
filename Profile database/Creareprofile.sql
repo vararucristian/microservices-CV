@@ -14,6 +14,7 @@ create table profile (
 	account_id int primary key,
 	age int NOT NULL,
 	gender varchar(45) NOT NULL
+	id_preferinta int NOT NULL,
 	);
 
 describe profile;
