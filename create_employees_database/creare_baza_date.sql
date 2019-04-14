@@ -1,6 +1,7 @@
 create database
 if not exists employees;
 
+use employees;
 
 drop table if exists employees;
 
