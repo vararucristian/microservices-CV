@@ -28,3 +28,19 @@ create table supervision(
 	);
 
 describe supervision;
+
+drop table if exists cv;
+
+create table cv(
+	id int primary key,
+	CNP varchar(15) not null unique,
+	firstName varchar(25) not null,
+	lastName varchar(50) not null,
+	gendre varchar(10) not null,
+	adress varchar(100),
+	position varchar(50) not null,
+	desciption varchar(300) not null,
+	jobRelatedSkils varchar(100) not null,
+);
+	
+describe cv;	
