@@ -2,6 +2,7 @@ package com.javainspires.simplejdbcapp.controller;
 
 import java.util.List;
 
+import com.javainspires.simplejdbcapp.UserProfile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,8 +31,8 @@ public class UserController {
   */
  @GetMapping(path = "/viewinfo/{getusernames}")
  
- public String getAllUserNames(@PathVariable("getusernames") String getusernames) {
-  return (String) userRepository.getAllUserNames(getusernames);
+ public UserProfile getAllUserNames(@PathVariable("getusernames") String getusernames) {
+  return userRepository.getAllUserNames(getusernames);
  }
  
  @GetMapping(path = "/changeinfo/{camp}/{dorinta}/{getusernames}")

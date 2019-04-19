@@ -2,20 +2,13 @@ package com.javainspires.simplejdbcapp.repository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.sql.*;
 
+import com.javainspires.simplejdbcapp.UserProfile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 import javax.sql.DataSource;
-
-import org.springframework.jdbc.core.JdbcTemplate;
-
 
 
 @Repository
@@ -28,7 +21,7 @@ public class UserRepository {
  private JdbcTemplate jdbcTemplate;
  
  
- public String getAllUserNames(String getusernames) {
+ public UserProfile getAllUserNames(String getusernames) {
   List<String> userNameList = new ArrayList<>();
   userNameList.addAll(jdbcTemplate.queryForList("select name from profile where account_id="+getusernames, String.class));
   userNameList.addAll(jdbcTemplate.queryForList("select last_name from profile where account_id="+getusernames, String.class));
@@ -39,12 +32,8 @@ public class UserRepository {
   userNameList.addAll(jdbcTemplate.queryForList("select account_id from profile where account_id="+getusernames, String.class));
   userNameList.addAll(jdbcTemplate.queryForList("select age from profile where account_id="+getusernames, String.class));
   userNameList.addAll(jdbcTemplate.queryForList("select gender from profile where account_id="+getusernames, String.class));
-  
-  String c="Nume : "+userNameList.get(1) + '\n' + "Prenume : "+userNameList.get(0)+'\n'+"Email : "+userNameList.get(2)+'\n'+"Adress : "+userNameList.get(3)+'\n'
-		   +"Username : "+userNameList.get(4)+'\n'+"Position in company : "+userNameList.get(5)+'\n'+"Account ID : "+userNameList.get(6)+'\n'+"Age : "+userNameList.get(7)+'\n'+
-		   "Gender : "+userNameList.get(8)+'\n' ; 
-  c = c.replaceAll("(\r\n|\n)", "<br />");
-  	return c;
+
+  	return new UserProfile(userNameList.get(0),userNameList.get(1),userNameList.get(2),userNameList.get(3),userNameList.get(4),userNameList.get(5),Integer.parseInt(userNameList.get(7)),userNameList.get(8));
  }
 
 
