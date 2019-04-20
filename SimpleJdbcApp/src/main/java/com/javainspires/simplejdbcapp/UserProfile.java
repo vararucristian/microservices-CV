@@ -20,4 +20,18 @@ public class UserProfile {
         this.age = age;
         this.gender = gender;
     }
+
+    @Override
+    public String toString() {
+        return "UserProfile{" +
+                "fname='" + fname + '\'' +
+                ", lname='" + lname + '\'' +
+                ", email='" + email + '\'' +
+                ", adress='" + adress + '\'' +
+                ", username='" + username + '\'' +
+                ", position='" + position + '\'' +
+                ", age=" + age +
+                ", gender='" + gender + '\'' +
+                '}';
+    }
 }
