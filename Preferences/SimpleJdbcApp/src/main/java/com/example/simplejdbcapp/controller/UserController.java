@@ -2,16 +2,14 @@ package com.example.simplejdbcapp.controller;
 
 //import java.util.List;
 
+import com.example.simplejdbcapp.repository.UserRepository;
 import net.minidev.json.JSONObject;
-import com.example.simplejdbcapp.Preferences;
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.example.simplejdbcapp.repository.UserRepository;
-
 @RestController
 @RequestMapping(path = "/user")
 public class UserController {
@@ -34,7 +32,6 @@ public class UserController {
  
  public JSONObject getAllPreferences(@PathVariable("accId") String accId) {
      return userRepository.getAllPreferences(accId);
-
  }
  
  @GetMapping(path = "/changePreference/08_10/{pref}/{accId}/{taskId}")
@@ -45,6 +42,7 @@ public class UserController {
  @GetMapping(path = "/changePreference/10_12/{pref}/{accId}/{taskId}")
  public String changeH1012(@PathVariable("pref") String pref,@PathVariable("accId") int accId, @PathVariable("taskId") int taskId) {
      return (String) userRepository.changeH1012(pref, accId, taskId);
+  Response.SC_CREATED.\
  }
  
  @GetMapping(path = "/changePreference/12_14/{pref}/{accId}/{taskId}")
