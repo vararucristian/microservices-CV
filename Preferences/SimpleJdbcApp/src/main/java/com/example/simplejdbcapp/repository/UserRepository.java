@@ -111,7 +111,7 @@ public int createPref(int acc_id, String h08_10, String h10_12, String h12_14, S
 			"insert into preferences (id_task, acc_id, 08_10, 10_12, 12_14, 14_16, 16_18, 18_20) values"
 			+ "(?, ?, ?, ?, ?, ?, ?, ?)",
 			result + 1, acc_id, h08_10, h10_12, h12_14, h14_16, h16_18, h18_20);
-	return Response.SC_OK;
+	return Response.SC_CREATED;
 	}
 	
  
