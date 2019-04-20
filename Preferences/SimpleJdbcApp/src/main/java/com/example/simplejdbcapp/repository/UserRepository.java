@@ -1,10 +1,14 @@
 package com.example.simplejdbcapp.repository;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.minidev.json.JSONObject;
 
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -48,46 +52,67 @@ public class UserRepository {
      this.jdbcTemplate = new JdbcTemplate(dataSource);
  }
 
- public String changeH810(String pref, int accId, int taskId) {
+ public int changeH810(String pref, int accId, int taskId) {
      this.jdbcTemplate.update(
              "update preferences set 08_10=? where acc_id = ? and id_task = ?",
              pref,accId, taskId);
-     return "200";
+     return Response.SC_OK;
  }
  
- public String changeH1012(String pref, int accId, int taskId) {
+ public int changeH1012(String pref, int accId, int taskId) {
      this.jdbcTemplate.update(
              "update preferences set 10_12=? where acc_id = ? and id_task = ?",
              pref,accId, taskId);
-     return "200";
+     return Response.SC_OK;
  }
  
- public String changeH1214(String pref, int accId, int taskId) {
+ public int changeH1214(String pref, int accId, int taskId) {
      this.jdbcTemplate.update(
              "update preferences set 12_14=? where acc_id = ? and id_task = ?",
              pref,accId, taskId);
-     return "200";
+     return Response.SC_OK;
  }
  
- public String changeH1416(String pref, int accId, int taskId) {
+ public int changeH1416(String pref, int accId, int taskId) {
      this.jdbcTemplate.update(
              "update preferences set 14_16=? where acc_id = ? and id_task = ?",
              pref,accId, taskId);
-     return "200";
+     return Response.SC_OK;
  }
  
- public String changeH1618(String pref, int accId, int taskId) {
+ public int changeH1618(String pref, int accId, int taskId) {
      this.jdbcTemplate.update(
              "update preferences set 16_18=? where acc_id = ? and id_task = ?",
              pref,accId, taskId);
-     return "200";
+     return Response.SC_OK;
  }
  
- public String changeH1820(String pref, int accId, int taskId) {
+ public int changeH1820(String pref, int accId, int taskId) {
      this.jdbcTemplate.update(
              "update preferences set 18_20=? where acc_id = ? and id_task = ?",
              pref,accId, taskId);
-     return "200";
+     return Response.SC_OK;
  }
+ 
+ public int deletePref(int accId) {
+	 this.jdbcTemplate.update(
+			 "delete from preferences where acc_id = ?",
+			 accId);
+	 return Response.SC_OK;
+ }
+
+
+public int createPref(int acc_id, String h08_10, String h10_12, String h12_14, String h14_16, String h16_18,
+		String h18_20) {
+	
+	Integer result = jdbcTemplate.queryForObject("select max(id_task) from preferences;", Integer.class);
+	
+	this.jdbcTemplate.update(
+			"insert into preferences (id_task, acc_id, 08_10, 10_12, 12_14, 14_16, 16_18, 18_20) values"
+			+ "(?, ?, ?, ?, ?, ?, ?, ?)",
+			result + 1, acc_id, h08_10, h10_12, h12_14, h14_16, h16_18, h18_20);
+	return Response.SC_CREATED;
+	}
+	
  
 }
