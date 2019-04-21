@@ -1,22 +1,20 @@
 package com.employees.employees.resources;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.catalina.connector.Response;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Repository;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 
 @RestController
@@ -27,7 +25,7 @@ public class EmployeesResource {
     JdbcTemplate jdbcTemplate;
 
     @RequestMapping("/fire/{id_hr}/{id_employee}")
-    public List<Object> fireEmployee(@PathVariable("id_hr") int id_hr, @PathVariable("id_employee") int id_employee){
+    public int fireEmployee(@PathVariable("id_hr") int id_hr, @PathVariable("id_employee") int id_employee){
 
         String result2 = "";
 
@@ -41,18 +39,18 @@ public class EmployeesResource {
         int result1 = jdbcTemplate.queryForObject(sql1, Integer.class);
 
         if(result == 0)
-            return Collections.singletonList("The employee with id " + id_hr + " does not exist");
+            return Response.SC_NOT_FOUND;
         else if(result1 == 0)
-                return Collections.singletonList("The employee with id " + id_employee + " does not exist");
+            return Response.SC_NOT_FOUND;
         else if(result2.compareTo("Human Resources") != 0)
-                return Collections.singletonList("The employee with id " + id_hr + " can't fire another employee");
+            return Response.SC_METHOD_NOT_ALLOWED;
         else{
-            return Collections.singletonList("The employee was fired");
+            return Response.SC_OK;
         }
     }
 
     @RequestMapping("/changeSuperior/{id_hr}/{id_employee}/{id_newSuperior}")
-    public List<Object> changeSuperior(@PathVariable("id_hr") int id_hr, @PathVariable("id_employee") int id_employee, @PathVariable("id_newSuperior") int id_newSuperior){
+    public int changeSuperior(@PathVariable("id_hr") int id_hr, @PathVariable("id_employee") int id_employee, @PathVariable("id_newSuperior") int id_newSuperior){
 
         String result2 = "";
 
@@ -70,68 +68,90 @@ public class EmployeesResource {
         int result3 = jdbcTemplate.queryForObject(sql3, Integer.class);
 
         if(result == 0)
-            return Collections.singletonList("The employee with id " + id_hr + " does not exist");
+            return Response.SC_NOT_FOUND;
         else if(result1 == 0)
-            return Collections.singletonList("The employee with id " + id_employee + " does not exist");
+            return Response.SC_NOT_FOUND;
         else if(result2.compareTo("Human Resources") != 0)
-            return Collections.singletonList("The employee with id " + id_hr + " can't change the superior to other employees");
+            return Response.SC_METHOD_NOT_ALLOWED;
         else if(result3 == 0)
-            return Collections.singletonList("The employee with id " + id_newSuperior + " does not exist");
+            return Response.SC_NOT_FOUND;
         else{
-            return Collections.singletonList("The superior was changed");
+            return Response.SC_OK;
         }
     }
 
     @RequestMapping("/viewMySubordinates/{id}")
-    public List<Employee> viewSubordinates (@PathVariable("id") int id) {
-
+    public ResponseEntity<String> viewSubordinates (@PathVariable("id") int id) throws URISyntaxException {
+        URI location = new URI("localhost");
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.setLocation(location);
+        responseHeaders.set("MyResponseHeader", "MyValue");
+        String verifySql= "select count(*) from employees where id="+id;
+        int verifyId=jdbcTemplate.queryForObject(verifySql, Integer.class);
+        if (verifyId==0)
+            return new ResponseEntity<String>("The id "+ id+ " does not exist.", responseHeaders, HttpStatus.NOT_FOUND);
+        else
+        {
         String sql ="SELECT ID, firstName, lastName, position FROM employees e1 join supervision on ID=id_supervised where id_superviser="+id;
         RowMapper<Employee> rowMapper = new BeanPropertyRowMapper<Employee>(Employee.class);
         //subordonatii subordonatilor
-        return this.jdbcTemplate.query(sql, rowMapper);
-        // mesaj daca nu are subordonati/ nu e corect id-ul
+            return new ResponseEntity<String>(this.jdbcTemplate.query(sql, rowMapper).toString(), responseHeaders, HttpStatus.OK);
+        // mesaj daca nu are subordonati
     }
-    @RequestMapping("/changeSalary/{id}/{id_subord}/{sum}")
-    public List<Object> changeSalary (@PathVariable("id") int id, @PathVariable("id_subord") int id_subord, @PathVariable("sum") int sum)
-    {
+    }
 
-        String sql2= "select count(*) from employees where id="+id_subord;
-        int res2=jdbcTemplate.queryForObject(sql2, Integer.class);
-        String sql1= "select position from employees where id="+id;
-        String position=jdbcTemplate.queryForObject(sql1, String.class);
-        if (res2==0)
-            return Collections.singletonList("The employee with ID " + id_subord + " does not exist!");
-        else
-        {
-            if (!position.equals("Human Resources")) {
-                return Collections.singletonList("You are not allowed to chenge someone's salary!");
-            } else{
-                String sql= "select Salary from employees where id="+id_subord;
-                int res=jdbcTemplate.queryForObject(
-                        sql, Integer.class);
-                //update
-                return Collections.singletonList("For employee with id " + id_subord + " the salary was " + res + " and now is " + sum + ".");
-            }}}
+
+    @RequestMapping("/changeSalary/{id}/{id_subord}/{sum}")
+    public int changeSalary (@PathVariable("id") int id, @PathVariable("id_subord") int id_subord, @PathVariable("sum") int sum) {
+        String sql3= "select count(*) from employees where id="+id;
+        int res2 = jdbcTemplate.queryForObject(sql3, Integer.class);
+        if (res2 == 0)
+            return Response.SC_NOT_FOUND;
+        else {
+            String sql2 = "select count(*) from employees where id=" + id_subord;
+            int res3 = jdbcTemplate.queryForObject(sql2, Integer.class);
+            String sql1 = "select position from employees where id=" + id;
+            String position = jdbcTemplate.queryForObject(sql1, String.class);
+            if (res3 == 0)
+                return Response.SC_NOT_FOUND;
+            else {
+                if (!position.equals("Human Resources")) {
+                    return Response.SC_METHOD_NOT_ALLOWED;
+                } else {
+                    String sql = "select Salary from employees where id=" + id_subord;
+                    int res = jdbcTemplate.queryForObject(
+                            sql, Integer.class);
+                    //update
+                   return Response.SC_OK;
+                }
+            }
+        }
+    }
+
 
     @RequestMapping("/changePosition/{id}/{id_subord}/{position}")
-    public List<Object> chengePosition (@PathVariable("id") int id, @PathVariable("id_subord") int id_subord, @PathVariable("position") String position)
+    public int chengePosition (@PathVariable("id") int id, @PathVariable("id_subord") int id_subord, @PathVariable("position") String position)
     {
-
+        String sql3= "select count(*) from employees where id="+id;
+        int res2 = jdbcTemplate.queryForObject(sql3, Integer.class);
+        if (res2 == 0)
+            return Response.SC_NOT_FOUND;
+        else {
         String sql2= "select count(*) from employees where id="+id_subord;
-        int res2=jdbcTemplate.queryForObject(sql2, Integer.class);
+        int res3=jdbcTemplate.queryForObject(sql2, Integer.class);
         String sql1= "select position from employees where id="+id;
         String position1=jdbcTemplate.queryForObject(sql1, String.class);
-        if (res2==0)
-            return Collections.singletonList("The employee with ID " + id_subord + " does not exist!");
+        if (res3==0)
+            return Response.SC_NOT_FOUND;
         else
         {
             if (!position1.equals("Human Resources")) {
-                return Collections.singletonList("You are not allowed to chenge someone's position!");
+                return Response.SC_METHOD_NOT_ALLOWED;
             } else{
                 String sql= "select Position from employees where id="+id_subord;
                 String res =jdbcTemplate.queryForObject(sql, String.class);
                 //update
-                return Collections.singletonList("For employee with id " + id_subord + " the position was " + res + " and now is " + position + ".");
+                return Response.SC_OK;
             }}
     }
-}
+}}

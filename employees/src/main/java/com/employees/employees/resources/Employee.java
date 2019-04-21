@@ -8,11 +8,11 @@ public class Employee {
 
     @Override
     public String toString() {
-        return "Employee{" +
-                "firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", id=" + id +
-                ", position='" + position + '\'' +
+        return "{" +
+                "\"firstName\":\"" + firstName + '\"' +
+                ", \"lastName\":\"" + lastName + '\"' +
+                ", \"id\":" + id +
+                ", \"position\":\"" + position + '\"' +
                 '}';
     }
 
