@@ -100,7 +100,7 @@ public class UserController {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setLocation(location);
         responseHeaders.set("MyResponseHeader", "MyValue");
-        return new ResponseEntity<String>(userRepository.changeage(dorinta,getusernames), responseHeaders, HttpStatus.OK);
+        return new ResponseEntity<String>(userRepository.changeage(dorinta,getusernames), responseHeaders, HttpStatus.CREATED);
     }
 
     @GetMapping(path = "/changeinfo/gender/{dorinta}/{getusernames}")

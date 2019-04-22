@@ -40,9 +40,9 @@ public class UserController {
  }
  
  @GetMapping(path = "/changePreference/10_12/{pref}/{accId}/{taskId}")
- public String changeH1012(@PathVariable("pref") String pref,@PathVariable("accId") int accId, @PathVariable("taskId") int taskId) {
-     return (String) userRepository.changeH1012(pref, accId, taskId);
-  Response.SC_CREATED.\
+ public int changeH1012(@PathVariable("pref") String pref,@PathVariable("accId") int accId, @PathVariable("taskId") int taskId) {
+  return userRepository.changeH1012(pref, accId, taskId);
+ // Response.SC_CREATED.\
  }
  
  @GetMapping(path = "/changePreference/12_14/{pref}/{accId}/{taskId}")
