@@ -42,8 +42,8 @@ public class UserRepository {
         profile.appendField("adress",userNameList.get(3));
         profile.appendField("username",userNameList.get(4));
         profile.appendField("position",userNameList.get(5));
-        profile.appendField("age",userNameList.get(6));
-        profile.appendField("gender",userNameList.get(7));
+        profile.appendField("age",userNameList.get(7));
+        profile.appendField("gender",userNameList.get(8));
 
         return profile;
     }
@@ -57,56 +57,56 @@ public class UserRepository {
         this.jdbcTemplate.update(
                 "update profile set name=? where account_id = ?",
                 dorinta,getusernames);
-        return "200";
+        return "Succes";
     }
 
     public String changeprenume(String dorinta,int getusernames) {
         this.jdbcTemplate.update(
                 "update profile set last_name=? where account_id = ?",
                 dorinta,getusernames);
-        return "200";
+        return "Succes";
     }
 
     public String changeemail(String dorinta,int getusernames) {
         this.jdbcTemplate.update(
                 "update profile set email=? where account_id = ?",
                 dorinta,getusernames);
-        return "200";
+        return "Succes";
     }
 
     public String changeadress(String dorinta,int getusernames) {
         this.jdbcTemplate.update(
                 "update profile set adress=? where account_id = ?",
                 dorinta,getusernames);
-        return "200";
+        return "Succes";
     }
 
     public String changeusername(String dorinta,int getusernames) {
         this.jdbcTemplate.update(
                 "update profile set username=? where account_id = ?",
                 dorinta,getusernames);
-        return "200";
+        return "Succes";
     }
 
     public String changeposition(String dorinta,int getusernames) {
         this.jdbcTemplate.update(
                 "update profile set position_in_company=? where account_id = ?",
                 dorinta,getusernames);
-        return "200";
+        return "Succes";
     }
 
     public String changeage(String dorinta,int getusernames) {
         this.jdbcTemplate.update(
                 "update profile set age=? where account_id = ?",
                 dorinta,getusernames);
-        return "200";
+        return "Succes";
     }
 
     public String changegender(String dorinta,int getusernames) {
         this.jdbcTemplate.update(
                 "update profile set gender=? where account_id = ?",
                 dorinta,getusernames);
-        return "200";
+        return "Succes";
     }
 
 }

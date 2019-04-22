@@ -1,0 +1,11 @@
+mysql/** filter=lfs diff=lfs merge=lfs -text
+mysql-connector-java-8.0.15/** filter=lfs diff=lfs merge=lfs -text
+mysql/bin/** filter=lfs diff=lfs merge=lfs -text
+mysql/data/** filter=lfs diff=lfs merge=lfs -text
+mysql/docs/** filter=lfs diff=lfs merge=lfs -text
+mysql/etc/** filter=lfs diff=lfs merge=lfs -text
+mysql/include/** filter=lfs diff=lfs merge=lfs -text
+mysql/lib/** filter=lfs diff=lfs merge=lfs -text
+mysql/run/** filter=lfs diff=lfs merge=lfs -text
+mysql/share/** filter=lfs diff=lfs merge=lfs -text
+mysql/var/** filter=lfs diff=lfs merge=lfs -text
