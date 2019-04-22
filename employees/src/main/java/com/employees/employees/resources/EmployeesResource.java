@@ -13,6 +13,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import static com.fasterxml.jackson.databind.jsonFormatVisitors.JsonValueFormat.URI;
+
 
 @RestController
 @RequestMapping("/employees")
