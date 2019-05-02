@@ -1,0 +1,15 @@
+insert into employee values (1, 'system engineer');
+insert into employee values (2, 'tester');
+insert into employee values (3, 'team leader');
+insert into employee values (4, 'tester');
+insert into employee values (5, 'system engineer');
+insert into employee values (6, 'human resources');
+
+select * from employee;
+
+insert into underlings values (3, 1);
+insert into underlings values (3, 2);
+insert into underlings values (2, 4);
+insert into underlings values (3, 5);
+
+select * from underlings;
