@@ -1,0 +1,21 @@
+use employees;
+
+drop table if exists employee;
+
+create table employee (
+	ID int primary key,
+	position varchar(50) not null
+	);
+
+describe employee;
+
+drop table if exists underlings;
+
+create table underlings(
+	id_superior int not null,
+	id_underling int not null,
+	foreign key (id_superior) references employee(ID),
+	foreign key (id_underling) references employee(ID)
+	);
+
+describe underlings;
