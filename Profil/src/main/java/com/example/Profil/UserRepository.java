@@ -22,7 +22,7 @@ public class UserRepository {
     private JdbcTemplate jdbcTemplate;
 
 
-    public JSONObject getAllUserNames(String getusernames) {
+    public JSONObject getInfoProfile(String getusernames) {
         List<String> userNameList = new ArrayList<>();
         userNameList.addAll(jdbcTemplate.queryForList("select name from profile where account_id="+getusernames, String.class));
         userNameList.addAll(jdbcTemplate.queryForList("select last_name from profile where account_id="+getusernames, String.class));

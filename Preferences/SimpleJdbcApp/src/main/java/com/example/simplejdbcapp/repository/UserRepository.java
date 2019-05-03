@@ -24,7 +24,7 @@ public class UserRepository {
  
  public JSONObject getAllPreferences(String accId) {
      List<String> preferencesList = new ArrayList<>();
-     preferencesList.addAll(jdbcTemplate.queryForList("select 08_10 from preferences where acc_id="+accId, String.class));
+     preferencesList.addAll(jdbcTemplate.queryForList("select 8_10 from preferences where acc_id="+accId, String.class));
      preferencesList.addAll(jdbcTemplate.queryForList("select 10_12 from preferences where acc_id="+accId, String.class));
      preferencesList.addAll(jdbcTemplate.queryForList("select 12_14 from preferences where acc_id="+accId, String.class));
      preferencesList.addAll(jdbcTemplate.queryForList("select 14_16 from preferences where acc_id="+accId, String.class));
@@ -33,7 +33,7 @@ public class UserRepository {
 
 
      JSONObject preference = new JSONObject();
-     preference.appendField("08_10",preferencesList.get(0));
+     preference.appendField("8_10",preferencesList.get(0));
      preference.appendField("10_12",preferencesList.get(1));
      preference.appendField("12_14",preferencesList.get(2));
      preference.appendField("14_16",preferencesList.get(3));
@@ -50,7 +50,7 @@ public class UserRepository {
 
  public String changeH810(String pref, int accId, int taskId) {
      this.jdbcTemplate.update(
-             "update preferences set 08_10=? where acc_id = ? and id_task = ?",
+             "update preferences set 8_10=? where acc_id = ? and id_task = ?",
              pref,accId, taskId);
      return "Succes";
  }
@@ -98,15 +98,15 @@ public class UserRepository {
  }
 
 
-public String createPref(int acc_id, String h08_10, String h10_12, String h12_14, String h14_16, String h16_18,
+public String createPref(int acc_id, String h8_10, String h10_12, String h12_14, String h14_16, String h16_18,
 		String h18_20) {
 	
 	Integer result = jdbcTemplate.queryForObject("select max(id_task) from preferences;", Integer.class);
 	
 	this.jdbcTemplate.update(
-			"insert into preferences (id_task, acc_id, 08_10, 10_12, 12_14, 14_16, 16_18, 18_20) values"
+			"insert into preferences (id_task, acc_id, 8_10, 10_12, 12_14, 14_16, 16_18, 18_20) values"
 			+ "(?, ?, ?, ?, ?, ?, ?, ?)",
-			result + 1, acc_id, h08_10, h10_12, h12_14, h14_16, h16_18, h18_20);
+			result + 1, acc_id, h8_10, h10_12, h12_14, h14_16, h16_18, h18_20);
 	return "Succes";
 	}
 	
