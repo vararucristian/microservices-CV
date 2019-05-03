@@ -34,14 +34,22 @@ public class EmployeesMicroserviceCollector {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setLocation(location);
         responseHeaders.set("MyResponseHeader", "MyValue");
-        if (verifyId(idEmployee) == false)
-            return new ResponseEntity<String>("The id " + idEmployee + " does not exist.", responseHeaders, HttpStatus.NOT_FOUND);
+        if (verifyId(idEmployee) == false) {
+            Response response= new Response(0, "The id " + idEmployee + " does not exist.");
+            return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.NOT_FOUND);
+        }
         else {
             String selectPositionStatement = "SELECT position from employee where id = " + idEmployee;
             String position = jdbcTemplate.queryForObject(selectPositionStatement, String.class);
-            if (!position.equals("human resurces"))
-                return new ResponseEntity<String>("The employee with  id "+ idEmployee+ " is not allowed to make changes.", responseHeaders, HttpStatus.METHOD_NOT_ALLOWED);
+            if (!position.equals("human resources")) {
+                Response response= new Response(0, "The employee with  id " + idEmployee + " is not allowed to make changes.");
+                return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.METHOD_NOT_ALLOWED);
+            }
             else
+            {
+                Response response= new Response(1,"Succes");
+                return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.OK);
+            }
 
         }
     }
