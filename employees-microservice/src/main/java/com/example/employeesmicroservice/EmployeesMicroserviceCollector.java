@@ -63,68 +63,61 @@ public class EmployeesMicroserviceCollector {
             if (verifyId(idSuperior) == false) {
                 Response response = new Response(0, "The superior with id " + idSuperior + " does not exist.");
                 return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.NOT_FOUND);
+            } else {
+                String insertIntoEmployeeStatement = "insert into employee (ID, position) values (" + idUnderling + ", '" + position + "');";
+                jdbcTemplate.execute(insertIntoEmployeeStatement);
+                String insertIntoUnderlingsStatement = "insert into underlings (id_superior, id_underling) values (" + idSuperior + ", " + idUnderling + ");";
+                jdbcTemplate.execute(insertIntoUnderlingsStatement);
+                Response response = new Response(1, "Succes.");
+                return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.OK);
             }
-            else
-            {
-            String insertIntoEmployeeStatement = "insert into employee (ID, position) values ("+ idUnderling+ ", '"+ position +"');";
-            jdbcTemplate.execute(insertIntoEmployeeStatement);
-            String insertIntoUnderlingsStatement = "insert into underlings (id_superior, id_underling) values ("+ idSuperior+ ", "+ idUnderling +");";
-            jdbcTemplate.execute(insertIntoUnderlingsStatement);
-            Response response = new Response(1, "Succes.");
-            return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.OK);}
-        }
-        else
-        {
+        } else {
             Response response = new Response(0, "This employee id already exists.");
             return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.BAD_REQUEST);
         }
     }
+
     @RequestMapping("/change-superior/{idUnderling}/{idSuperior}")
     private ResponseEntity<String> changeSuperior(@PathVariable("idUnderling") int idUnderling, @PathVariable("idSuperior") int idSuperior) throws URISyntaxException {
         URI location = new URI("localhost");
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setLocation(location);
         responseHeaders.set("MyResponseHeader", "MyValue");
-        if (verifyId(idUnderling) == false)
-            {
-                Response response = new Response(0, "The employee with id " + idUnderling + " does not exist.");
-                return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.NOT_FOUND);
-            }
-            else
-            if (verifyId(idSuperior) == false) {
-                Response response = new Response(0, "The superior with id " + idSuperior + " does not exist.");
-                return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.NOT_FOUND);
-            }
-            else
-            {
-                String deleteStatement = "delete from underlings where id_underling="+ idUnderling+";";
-                jdbcTemplate.execute(deleteStatement);
-                String insertStatement = "insert into underlings (id_superior, id_underling) values ("+ idSuperior+ ", "+ idUnderling +");";
-                jdbcTemplate.execute(insertStatement);
-                Response response = new Response(1, "Succes.");
-                return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.OK);}
+        if (verifyId(idUnderling) == false) {
+            Response response = new Response(0, "The employee with id " + idUnderling + " does not exist.");
+            return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.NOT_FOUND);
+        } else if (verifyId(idSuperior) == false) {
+            Response response = new Response(0, "The superior with id " + idSuperior + " does not exist.");
+            return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.NOT_FOUND);
+        } else {
+            String deleteStatement = "delete from underlings where id_underling=" + idUnderling + ";";
+            jdbcTemplate.execute(deleteStatement);
+            String insertStatement = "insert into underlings (id_superior, id_underling) values (" + idSuperior + ", " + idUnderling + ");";
+            jdbcTemplate.execute(insertStatement);
+            Response response = new Response(1, "Succes.");
+            return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.OK);
         }
+    }
+
     @RequestMapping("/remove-underling/{idUnderling}")
     private ResponseEntity<String> removeUnderling(@PathVariable("idUnderling") int idUnderling) throws URISyntaxException {
         URI location = new URI("localhost");
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setLocation(location);
         responseHeaders.set("MyResponseHeader", "MyValue");
-        if (verifyId(idUnderling) == false)
-        {
+        if (verifyId(idUnderling) == false) {
             Response response = new Response(0, "The employee with id " + idUnderling + " does not exist.");
             return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.NOT_FOUND);
-        }
-        else
-        {
-            String deleteFromUnderlingsStatement = "delete from underlings where id_underling="+ idUnderling+";";
+        } else {
+            String deleteFromUnderlingsStatement = "delete from underlings where id_underling=" + idUnderling + ";";
             jdbcTemplate.execute(deleteFromUnderlingsStatement);
-            String deleteFromUnderlingsSuperiorStatement = "delete from underlings where id_superior="+ idUnderling+";";
+            String deleteFromUnderlingsSuperiorStatement = "delete from underlings where id_superior=" + idUnderling + ";";
             jdbcTemplate.execute(deleteFromUnderlingsSuperiorStatement);
-            String deleteFromEmployeeStatement = "delete from employee where ID="+ idUnderling+";";
+            String deleteFromEmployeeStatement = "delete from employee where ID=" + idUnderling + ";";
             jdbcTemplate.execute(deleteFromEmployeeStatement);
             Response response = new Response(1, "Succes.");
-            return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.OK);}
+            return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.OK);
+        }
     }
 
     @RequestMapping("/viewUnderlings/{userID}")
@@ -133,12 +126,10 @@ public class EmployeesMicroserviceCollector {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setLocation(location);
         responseHeaders.set("MyResponseHeader", "MyValue");
-        if (verifyId(userID) == false)
-        {
+        if (verifyId(userID) == false) {
             Response response = new Response(0, "The employee with id " + userID + " does not exist.");
             return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.NOT_FOUND);
-        }
-        else {
+        } else {
             String selectNumberUnderlings = "select count(id_superior) from underlings where id_superior = " + userID;
             int numberUnderlings = jdbcTemplate.queryForObject(selectNumberUnderlings, Integer.class);
             if (numberUnderlings == 0) {
@@ -155,29 +146,6 @@ public class EmployeesMicroserviceCollector {
                 return new ResponseEntity<String>(response1.toString(), responseHeaders, HttpStatus.OK);
             }
         }
-    @RequestMapping("/remove-underling/{idUnderling}")
-    private ResponseEntity<String> removeUnderling(@PathVariable("idUnderling") int idUnderling) throws URISyntaxException {
-        URI location = new URI("localhost");
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.setLocation(location);
-        responseHeaders.set("MyResponseHeader", "MyValue");
-        if (verifyId(idUnderling) == false)
-        {
-            Response response = new Response(0, "The employee with id " + idUnderling + " does not exist.");
-            return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.NOT_FOUND);
-        }
-        else
-        {
-            String deleteFromUnderlingsStatement = "delete from underlings where id_underling="+ idUnderling+";";
-            jdbcTemplate.execute(deleteFromUnderlingsStatement);
-            String deleteFromUnderlingsSuperiorStatement = "delete from underlings where id_superior="+ idUnderling+";";
-            jdbcTemplate.execute(deleteFromUnderlingsSuperiorStatement);
-            String deleteFromEmployeeStatement = "delete from employee where ID="+ idUnderling+";";
-            jdbcTemplate.execute(deleteFromEmployeeStatement);
-            Response response = new Response(1, "Succes.");
-            return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.OK);}
     }
 }
-
-    }
 
