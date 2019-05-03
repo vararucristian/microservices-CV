@@ -155,7 +155,29 @@ public class EmployeesMicroserviceCollector {
                 return new ResponseEntity<String>(response1.toString(), responseHeaders, HttpStatus.OK);
             }
         }
+    @RequestMapping("/remove-underling/{idUnderling}")
+    private ResponseEntity<String> removeUnderling(@PathVariable("idUnderling") int idUnderling) throws URISyntaxException {
+        URI location = new URI("localhost");
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.setLocation(location);
+        responseHeaders.set("MyResponseHeader", "MyValue");
+        if (verifyId(idUnderling) == false)
+        {
+            Response response = new Response(0, "The employee with id " + idUnderling + " does not exist.");
+            return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.NOT_FOUND);
+        }
+        else
+        {
+            String deleteFromUnderlingsStatement = "delete from underlings where id_underling="+ idUnderling+";";
+            jdbcTemplate.execute(deleteFromUnderlingsStatement);
+            String deleteFromUnderlingsSuperiorStatement = "delete from underlings where id_superior="+ idUnderling+";";
+            jdbcTemplate.execute(deleteFromUnderlingsSuperiorStatement);
+            String deleteFromEmployeeStatement = "delete from employee where ID="+ idUnderling+";";
+            jdbcTemplate.execute(deleteFromEmployeeStatement);
+            Response response = new Response(1, "Succes.");
+            return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.OK);}
     }
 }
 
+    }
 
