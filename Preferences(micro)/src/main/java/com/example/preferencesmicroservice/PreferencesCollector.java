@@ -42,6 +42,15 @@ public class PreferencesCollector {
             exists = false;
         return exists;
     }
+    
+     private Boolean verifyIdFK(int id) {
+        Boolean exists = true;
+        String verifyIdStatement = "SELECT count(account_id) from profile where account_id = " + id;
+        int result = jdbcTemplate.queryForObject(verifyIdStatement, Integer.class);
+        if (result == 0)
+            exists = false;
+        return exists;
+    }
 
     @RequestMapping("/edit-preferences/{accId}/{time}/{pref}")
     private ResponseEntity<String> editPreferences(@PathVariable("accId") int accId, @PathVariable("time") String time, @PathVariable("pref") String pref) throws URISyntaxException {
@@ -123,6 +132,46 @@ public class PreferencesCollector {
             Response response = new Response(1, "Succes.");
             return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.OK);
         }
+    }
+    
+    @RequestMapping("/add-preferences/{userID}/{op1}/{op2}/{op3}")
+    public ResponseEntity<String> addPreferences(@PathVariable("userID") int userID,@PathVariable("op1") String op1,@PathVariable("op2") String op2,@PathVariable("op3") String op3) throws URISyntaxException {
+        URI location = new URI("localhost");
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.setLocation(location);
+        responseHeaders.set("MyResponseHeader", "MyValue");
+
+        if (verifyIdFK(userID) == false)
+        {
+            Response response = new Response(0, "The profile database does not have ID = " + userID + " ");
+            return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.NOT_FOUND);
+        }
+
+        if (verifyPref(op1) == false)
+        {
+            Response response = new Response(0, "The preference " + op1 + " does not exist.");
+            return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.NOT_FOUND);
+        }
+
+        else if (verifyPref(op2) == false)
+        {
+            Response response = new Response(0, "The preference " + op2 + " does not exist.");
+            return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.NOT_FOUND);
+        }
+
+        else if (verifyPref(op3) == false)
+        {
+            Response response = new Response(0, "The preference " + op3 + " does not exist.");
+            return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.NOT_FOUND);
+        }
+
+        else
+            {
+            String insertIntoPreferences = "insert into preferences values (" + userID + ", '" + op1 + "','" + op2 + "','" + op3 + "');";
+            jdbcTemplate.execute(insertIntoPreferences);
+            Response response = new Response(1, "Succes.");
+            return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.OK);
+            }
     }
 }
 
