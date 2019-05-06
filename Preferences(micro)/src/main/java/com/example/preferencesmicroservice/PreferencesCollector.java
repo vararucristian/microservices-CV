@@ -43,15 +43,6 @@ public class PreferencesCollector {
         return exists;
     }
     
-     private Boolean verifyIdFK(int id) {
-        Boolean exists = true;
-        String verifyIdStatement = "SELECT count(account_id) from profile where account_id = " + id;
-        int result = jdbcTemplate.queryForObject(verifyIdStatement, Integer.class);
-        if (result == 0)
-            exists = false;
-        return exists;
-    }
-
     @RequestMapping("/edit-preferences/{accId}/{time}/{pref}")
     private ResponseEntity<String> editPreferences(@PathVariable("accId") int accId, @PathVariable("time") String time, @PathVariable("pref") String pref) throws URISyntaxException {
         URI location = new URI("localhost");
@@ -140,12 +131,6 @@ public class PreferencesCollector {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setLocation(location);
         responseHeaders.set("MyResponseHeader", "MyValue");
-
-        if (verifyIdFK(userID) == false)
-        {
-            Response response = new Response(0, "The profile database does not have ID = " + userID + " ");
-            return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.NOT_FOUND);
-        }
 
         if (verifyPref(op1) == false)
         {
