@@ -1,26 +1,20 @@
 package com.example.employeesmicroservice;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.stereotype.Service;
 
-import javax.validation.constraints.Null;
-import java.net.URI;
-import java.net.URISyntaxException;
-
-@Component
+@Service
 public class EmployeeService {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    private Boolean verifyId(int id) {
+    public Boolean verifyId(int id) {
         Boolean exists = true;
         String verifyIdStatement = "SELECT count(id) from employee where id = " + id;
         int result = jdbcTemplate.queryForObject(verifyIdStatement, Integer.class);
@@ -30,7 +24,7 @@ public class EmployeeService {
     }
 
     public Response verifyPosition(int idEmployee) {
-        if (verifyId(idEmployee) == false) {
+        if (!verifyId(idEmployee)) {
             Response response = new Response(0, "The id "
                     + idEmployee + " does not exist.", HttpStatus.NOT_FOUND);
             return response;
@@ -93,7 +87,7 @@ public class EmployeeService {
     }
 
     public Response removeUnderling(int idUnderling) {
-        if (verifyId(idUnderling) == false) {
+        if (!verifyId(idUnderling)) {
             Response response = new Response(0, "The employee with id "
                     + idUnderling + " does not exist.", HttpStatus.NOT_FOUND);
             return response;
