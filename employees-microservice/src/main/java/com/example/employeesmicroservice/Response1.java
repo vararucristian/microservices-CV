@@ -12,6 +12,10 @@ public class Response1 {
         this.underlings = underlings;
     }
 
+    public Response getResponse() {
+        return response;
+    }
+
     @Override
     public String toString() {
         return "[\n" +
