@@ -140,9 +140,9 @@ public class ProfileCollector
         }
     }
 
-    @RequestMapping("/add-profile/{userID}/{op1}/{op2}/{op3}/{op4}/{op5}")
-    public ResponseEntity<String> addProfile(@PathVariable("userID") int userID,@PathVariable("op1") String op1,@PathVariable("op2") String op2,
-                                             @PathVariable("op3") String op3,@PathVariable("op4") String op4,@PathVariable("op5") String op5) {
+    @RequestMapping("/add-profile/{userID}/{nume}/{prenume}/{email}/{parola}/{data_inregistrare}")
+    public ResponseEntity<String> addProfile(@PathVariable("userID") int userID,@PathVariable("nume") String nume,@PathVariable("prenume") String prenume,
+                                             @PathVariable("email") String email,@PathVariable("parola") String parola,@PathVariable("data_inregistrare") String data_inregistrare) {
         URI location = null;
         try
         {
@@ -164,7 +164,7 @@ public class ProfileCollector
 
         else
         {
-            String insertIntoPreferences = "insert into MS_USER values (" + userID + ", '" + op1 + "','" + op2 + "','" + op3 + "','" + op4 + "','" + op5 + "');";
+            String insertIntoPreferences = "insert into MS_USER values (" + userID + ", '" + nume + "','" + prenume + "','" + email + "','" + parola + "','" + data_inregistrare + "');";
             jdbcTemplate.execute(insertIntoPreferences);
             Response response = new Response(1, "Succes.");
             return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.OK);
