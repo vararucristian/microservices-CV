@@ -57,7 +57,7 @@ public class EmployeeService {
                 String insertIntoUnderlingsStatement = "insert into underlings (id_superior, id_underling)" +
                         " values (" + idSuperior + ", " + idUnderling + ");";
                 jdbcTemplate.execute(insertIntoUnderlingsStatement);
-                Response response = new Response(1, "Succes.", HttpStatus.OK);
+                Response response = new Response(1, "Succes", HttpStatus.OK);
                 return response;
             }
         } else {
@@ -81,7 +81,7 @@ public class EmployeeService {
             String insertStatement = "insert into underlings (id_superior, id_underling)" +
                     " values (" + idSuperior + ", " + idUnderling + ");";
             jdbcTemplate.execute(insertStatement);
-            Response response = new Response(1, "Succes.", HttpStatus.OK);
+            Response response = new Response(1, "Succes", HttpStatus.OK);
             return response;
         }
     }

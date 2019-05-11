@@ -48,4 +48,47 @@ public class EmployeeServiceTest {
         String delete = "delete from employee where id = " + maxId + " or id = " + (maxId + 1);
         jdbcTemplate.execute(delete);
     }
+
+    @Test
+    public void addUnderlingTest (){
+        String selectMaxId = "select max(id) from employee";
+        int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
+        assertEquals( new Response(0, "The superior with id " + (maxId+1 ) + " does not exist.", HttpStatus.NOT_FOUND),
+                employeeService.addUnderling(maxId + 2  , maxId+1, "position"));
+        assertEquals( new Response(0, "This employee id already exists.", HttpStatus.BAD_REQUEST),
+                employeeService.addUnderling(maxId  , maxId, "position"));
+        assertEquals( new Response(1, "Succes", HttpStatus.OK),employeeService.addUnderling(maxId + 1 , maxId, "position"));
+        String delete = "delete from employee where id = " + maxId+1;
+        jdbcTemplate.execute(delete);
+    }
+
+    @Test
+    public void changeSuperiorTest(){
+        String selectMaxId = "select max(id_superior) from underlings";
+        String selectMinId ="select min(id_underling) from underlings";
+        // se mai poate verifica daca max chiar e seful lui min
+        int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
+        int minId = jdbcTemplate.queryForObject(selectMinId, Integer.class);
+        System.out.println(maxId+".."+minId);
+        String selectRealSuperior ="select id_superior from underlings where id_underling="+ minId;
+        int RealSuperiorId = jdbcTemplate.queryForObject(selectMinId, Integer.class);
+        assertEquals(new Response(0, "The employee with id " + (minId-1) + " does not exist.", HttpStatus.NOT_FOUND),
+                employeeService.changeSuperior(minId-1, maxId));
+        assertEquals(new Response(0, "The superior with id " + (maxId+1) + " does not exist.", HttpStatus.NOT_FOUND),
+                employeeService.changeSuperior(maxId, maxId+1));
+        assertEquals(new Response(1, "Succes", HttpStatus.OK), employeeService.changeSuperior(minId, maxId));
+        String delete = "delete from underlings where id_superior =" + maxId+ " and id_underling="+ minId;
+        jdbcTemplate.execute(delete);
+        String insert = "insert into underlings (id_superior, id_underling) values ( " +RealSuperiorId +" , "+ minId+" )";
+        jdbcTemplate.execute(insert);
+    }
+    //test si pentru cand min/max nu e din tabela underlins
+
+    @Test
+    public void removeUnderlingTest(){
+        String selectMaxId = "select max(id) from employee";
+        int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
+        assertEquals(new Response(0, "The employee with id " + (maxId+1) + " does not exist.", HttpStatus.NOT_FOUND),
+                employeeService.removeUnderling(maxId+1));
+    }
 }
