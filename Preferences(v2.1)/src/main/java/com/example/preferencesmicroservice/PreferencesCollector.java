@@ -27,6 +27,15 @@ public class PreferencesCollector {
             exists = false;
         return exists;
     }
+    
+    private Boolean verifyProfile(int id) {
+        Boolean exists = true;
+        String verifyIdStatement = "SELECT count(id_user) from profile where id_user = " + id;
+        int result = jdbcTemplate.queryForObject(verifyIdStatement, Integer.class);
+        if (result == 0)
+            exists = false;
+        return exists;
+    }
 
     private Boolean verifyTime(String time) {
         Boolean exists = true;
@@ -163,9 +172,15 @@ public class PreferencesCollector {
         responseHeaders.setLocation(location);
         responseHeaders.set("MyResponseHeader", "MyValue");
 
-        if (verifyId(userID) != false)
+        if (verifyProfile(userID) == false)
         {
-            Response response = new Response(0, "The profile with id " + userID + " already exists.");
+            Response response = new Response(0, "The profile with id " + userID + " does not exist.");
+            return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.NOT_FOUND);
+        }
+
+        else if (verifyId(userID) != false)
+        {
+            Response response = new Response(0, "The preference with id " + userID + " already exists.");
             return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.NOT_FOUND);
         }
 
