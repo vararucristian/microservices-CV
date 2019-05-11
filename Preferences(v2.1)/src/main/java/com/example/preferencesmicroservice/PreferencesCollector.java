@@ -148,8 +148,8 @@ public class PreferencesCollector {
         }
     }
 
-    @RequestMapping("/add-preferences/{userID}/{op1}/{op2}/{op3}")
-    public ResponseEntity<String> addPreferences(@PathVariable("userID") int userID,@PathVariable("op1") String op1,@PathVariable("op2") String op2,@PathVariable("op3") String op3) {
+    @RequestMapping("/add-preferences/{userID}/{morning}/{afternoon}/{evening}")
+    public ResponseEntity<String> addPreferences(@PathVariable("userID") int userID,@PathVariable("morning") String morning,@PathVariable("afternoon") String afternoon,@PathVariable("evening") String evening) {
         URI location = null;
         try
         {
@@ -169,27 +169,27 @@ public class PreferencesCollector {
             return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.NOT_FOUND);
         }
 
-        else if (verifyPref(op1) == false)
+        else if (verifyPref(morning) == false)
         {
-            Response response = new Response(0, "The preference " + op1 + " does not exist.");
+            Response response = new Response(0, "The preference " + morning + " does not exist.");
             return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.NOT_FOUND);
         }
 
-        else if (verifyPref(op2) == false)
+        else if (verifyPref(afternoon) == false)
         {
-            Response response = new Response(0, "The preference " + op2 + " does not exist.");
+            Response response = new Response(0, "The preference " + afternoon + " does not exist.");
             return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.NOT_FOUND);
         }
 
-        else if (verifyPref(op3) == false)
+        else if (verifyPref(evening) == false)
         {
-            Response response = new Response(0, "The preference " + op3 + " does not exist.");
+            Response response = new Response(0, "The preference " + evening + " does not exist.");
             return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.NOT_FOUND);
         }
 
         else
         {
-            String insertIntoPreferences = "insert into preferences values (" + userID + ", '" + op1 + "','" + op2 + "','" + op3 + "');";
+            String insertIntoPreferences = "insert into preferences values (" + userID + ", '" + morning + "','" + afternoon + "','" + evening + "');";
             jdbcTemplate.execute(insertIntoPreferences);
             Response response = new Response(1, "Succes.");
             return new ResponseEntity<String>(response.toString(), responseHeaders, HttpStatus.OK);
