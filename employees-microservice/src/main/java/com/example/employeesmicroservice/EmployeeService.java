@@ -1,13 +1,25 @@
 package com.example.employeesmicroservice;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+import sun.net.www.http.HttpClient;
+
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class EmployeeService {
@@ -103,7 +115,7 @@ public class EmployeeService {
         }
     }
 
-    public Response1 viewUnderlings(int userID) {
+    public Response1 viewUnderlings(int userID)  {
         if (!verifyId(userID)) {
             Response response = new Response(0, "The employee with id "
                     + userID + " does not exist.", HttpStatus.NOT_FOUND);
@@ -120,12 +132,36 @@ public class EmployeeService {
             } else {
                 String selectUnderlings = "select ID, position from employee " +
                         " join underlings on ID = id_underling where id_superior = " + userID;
-                RowMapper<Underlings> rowMapper = new BeanPropertyRowMapper<Underlings>(Underlings.class);
+                RowMapper<Underling> rowMapper = new BeanPropertyRowMapper<Underling>(Underling.class);
+                List<Underling> underlings =  this.jdbcTemplate.query(selectUnderlings, rowMapper);
+                List <UnderlingData> myUnderlings= new ArrayList<UnderlingData>();
+                for (Underling underling: underlings) {
+                    ResponseEntity<String> raspuns = null;
+                        String url = "http://104.199.20.255:8100/profile/get-profile/" + underling.getID();
+                    try{
+                        raspuns=new RestTemplate().getForEntity(url, String.class);
+                    }catch(HttpClientErrorException e){
+                        Response response = new Response(0, "The underling with id "
+                                + underling.getID() + " do not have a profile. ", HttpStatus.NOT_FOUND);
+                        Response1 response1 = new Response1(response, null);
+                        return response1;
+                    }
+                    try {
+                        JSONArray obj = new JSONArray(raspuns.toString().substring(5));
+                        JSONArray obj2 = obj.getJSONArray(1);
+                        JSONObject obj1  = obj.optJSONObject(0);
+                        JSONObject profile = obj2.optJSONObject(0);
+                        if (profile != null){
+                            String email = profile.getString("email");
+                            myUnderlings.add(new UnderlingData(underling, email));
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }}
                 Response response = new Response(1, "success", HttpStatus.OK);
-                Response1 response1 =
-                        new Response1(response, this.jdbcTemplate.query(selectUnderlings, rowMapper));
-                return response1;
+                Response1 response1 = new Response1(response, myUnderlings);
+                return response1;}
             }
         }
     }
-}
+

@@ -1,15 +1,15 @@
 package com.example.employeesmicroservice;
 
-public class Underlings {
+public class Underling {
     int ID;
     String position;
 
-    public Underlings(int ID, String position) {
+    public Underling(int ID, String position) {
         this.ID = ID;
         this.position = position;
     }
 
-    public Underlings(){
+    public Underling(){
 
     }
 

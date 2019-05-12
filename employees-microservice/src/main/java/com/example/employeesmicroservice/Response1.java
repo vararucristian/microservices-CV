@@ -5,9 +5,9 @@ import java.util.List;
 
 public class Response1 {
     private Response response;
-    private List<Underlings> underlings = new ArrayList<>();
+    private List<UnderlingData> underlings = new ArrayList<>();
 
-    public Response1(Response response, List<Underlings> underlings) {
+    public Response1(Response response, List<UnderlingData> underlings) {
         this.response = response;
         this.underlings = underlings;
     }
@@ -20,7 +20,7 @@ public class Response1 {
     public String toString() {
         return "[\n" +
                 "\t" + response +
-                ",\n\t" + underlings  +
-                "\n]";
+                ",\n\t{ \"underlings\" : "  + underlings  +
+                "\n}]";
     }
 }
