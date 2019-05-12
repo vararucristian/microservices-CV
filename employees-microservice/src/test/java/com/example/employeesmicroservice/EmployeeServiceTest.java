@@ -66,16 +66,19 @@ public class EmployeeServiceTest {
     public void changeSuperiorTest(){
         String selectMaxId = "select max(id_superior) from underlings";
         String selectMinId ="select min(id_underling) from underlings";
+        String selectMaxIdEmployee = "select max(id) from employee";
+        String selectMinIdEmployee ="select min(id) from employee";
         // se mai poate verifica daca max chiar e seful lui min
         int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
         int minId = jdbcTemplate.queryForObject(selectMinId, Integer.class);
-        System.out.println(maxId+".."+minId);
+        int maxIdEmployee = jdbcTemplate.queryForObject(selectMaxIdEmployee, Integer.class) ;
+        int minIdEmployee = jdbcTemplate.queryForObject(selectMinIdEmployee, Integer.class);
         String selectRealSuperior ="select id_superior from underlings where id_underling="+ minId;
         int RealSuperiorId = jdbcTemplate.queryForObject(selectMinId, Integer.class);
-        assertEquals(new Response(0, "The employee with id " + (minId-1) + " does not exist.", HttpStatus.NOT_FOUND),
-                employeeService.changeSuperior(minId-1, maxId));
-        assertEquals(new Response(0, "The superior with id " + (maxId+1) + " does not exist.", HttpStatus.NOT_FOUND),
-                employeeService.changeSuperior(maxId, maxId+1));
+        assertEquals(new Response(0, "The employee with id " + (minIdEmployee-1) + " does not exist.", HttpStatus.NOT_FOUND),
+                employeeService.changeSuperior(minIdEmployee-1, maxId));
+        assertEquals(new Response(0, "The superior with id " + (maxIdEmployee+1) + " does not exist.", HttpStatus.NOT_FOUND),
+                employeeService.changeSuperior(maxId, maxIdEmployee+1));
         assertEquals(new Response(1, "Succes", HttpStatus.OK), employeeService.changeSuperior(minId, maxId));
         String delete = "delete from underlings where id_superior =" + maxId+ " and id_underling="+ minId;
         jdbcTemplate.execute(delete);
@@ -90,5 +93,6 @@ public class EmployeeServiceTest {
         int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
         assertEquals(new Response(0, "The employee with id " + (maxId+1) + " does not exist.", HttpStatus.NOT_FOUND),
                 employeeService.removeUnderling(maxId+1));
+
     }
 }
