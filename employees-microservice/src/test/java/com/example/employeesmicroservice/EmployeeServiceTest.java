@@ -57,9 +57,12 @@ public class EmployeeServiceTest {
                 employeeService.addUnderling(maxId + 2  , maxId+1, "position"));
         assertEquals( new Response(0, "This employee id already exists.", HttpStatus.BAD_REQUEST),
                 employeeService.addUnderling(maxId  , maxId, "position"));
-        assertEquals( new Response(1, "Succes", HttpStatus.OK),employeeService.addUnderling(maxId + 1 , maxId, "position"));
-        String delete = "delete from employee where id = " + maxId+1;
-        jdbcTemplate.execute(delete);
+        assertEquals( new Response(1, "Succes", HttpStatus.OK),
+                employeeService.addUnderling(maxId + 1 , maxId, "position"));
+        String deleteEmployee = "delete from employee where id = " + (maxId+1);
+        String deleteUnderling= "delete from underlings where id_underling=" + (maxId+1);
+        jdbcTemplate.execute(deleteUnderling);
+        jdbcTemplate.execute(deleteEmployee);
     }
 
     @Test
@@ -85,13 +88,18 @@ public class EmployeeServiceTest {
         String insert = "insert into underlings (id_superior, id_underling) values ( " +RealSuperiorId +" , "+ minId+" )";
         jdbcTemplate.execute(insert);
     }
-    //test si pentru cand min/max nu e din tabela underlins
 
     @Test
     public void removeUnderlingTest(){
         String selectMaxId = "select max(id) from employee";
         int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
         assertEquals(new Response(0, "The employee with id " + (maxId+1) + " does not exist.", HttpStatus.NOT_FOUND),
+                employeeService.removeUnderling(maxId+1));
+        String insertEmployee = "insert into employee values(" + (maxId+1) + ", \'position\')";
+        String insertUnderling = "insert into underlings values(" + (maxId) + ","+ (maxId+1)+")";
+        jdbcTemplate.execute(insertEmployee);
+        jdbcTemplate.execute(insertUnderling);
+        assertEquals(new Response(1, "Succes.", HttpStatus.OK),
                 employeeService.removeUnderling(maxId+1));
 
     }
