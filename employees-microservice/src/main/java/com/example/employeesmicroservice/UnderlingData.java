@@ -31,4 +31,12 @@ public class UnderlingData {
                 ",\n\t\"job\": \"" + underling.getPosition() + "\"" +
                 "\n}";
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (!(obj instanceof UnderlingData)) return false;
+        UnderlingData comp = (UnderlingData) obj;
+        return (comp.underling.equals(underling) && comp.email.equals(email));
+    }
 }

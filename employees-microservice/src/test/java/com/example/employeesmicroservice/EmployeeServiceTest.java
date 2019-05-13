@@ -1,13 +1,24 @@
 package com.example.employeesmicroservice;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
@@ -102,5 +113,78 @@ public class EmployeeServiceTest {
         assertEquals(new Response(1, "Succes.", HttpStatus.OK),
                 employeeService.removeUnderling(maxId+1));
 
+    }
+
+    @Test
+    public void viewUnderlingsTest() {
+        String selectMaxId = "select max(id) from employee";
+        int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
+        String insertSuperior = "insert into employee values(" + (maxId + 1) + ", \'position\')";
+        jdbcTemplate.execute(insertSuperior);
+        assertEquals(new Response1(new Response(0, "The employee with id "
+                        + (maxId + 2) + " does not exist.", HttpStatus.NOT_FOUND), null),
+                employeeService.viewUnderlings(maxId + 2));
+        assertEquals(new Response1(new Response(0, "The employee with id "
+                        + (maxId + 1) + " has not underlings", HttpStatus.BAD_REQUEST), null),
+                employeeService.viewUnderlings(maxId + 1));
+        String deleteSuperior = "delete from employee where id = " + (maxId + 1);
+        jdbcTemplate.execute(deleteSuperior);
+    }
+
+    @Test
+    public void getProfileUnderlingErrorTest() {
+        String selectMaxId = "select max(id) from employee";
+        int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class);
+        String insertEmployee = "insert into employee values(" + (maxId + 1) + ", \'position\')";
+        String insertUnderling = "insert into underlings values(" + (maxId) + ", " + (maxId + 1) + ")";
+        jdbcTemplate.execute(insertEmployee);
+        jdbcTemplate.execute(insertUnderling);
+        String selectUnderlings = "select ID, position from employee " +
+                " join underlings on ID = id_underling where id_superior = " + maxId;
+        RowMapper<Underling> rowMapper = new BeanPropertyRowMapper<Underling>(Underling.class);
+        List<Underling> underlings =  this.jdbcTemplate.query(selectUnderlings, rowMapper);
+        assertEquals(new Response1(new Response(0, "The underling with id "
+                        + (maxId + 1) + " do not have a profile. ", HttpStatus.NOT_FOUND), null),
+                employeeService.getProfileUnderlings(underlings));
+        String deleteUnderling = "delete from underlings where id_underling = " + (maxId + 1);
+        String deleteEmployee = "delete from employee where id = " + (maxId + 1);
+        jdbcTemplate.execute(deleteUnderling);
+        jdbcTemplate.execute(deleteEmployee);
+    }
+
+    @Test
+    public void getProfileUnderlingsCorrectTest() {
+        String selectMaxId = "select max(id) from employee";
+        int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class);
+        String insertEmployee = "insert into employee values(" + (maxId + 1) + ", \'position\')";
+        String insertUnderling = "insert into underlings values(" + (maxId + 1) + ", " + maxId + ")";
+        jdbcTemplate.execute(insertEmployee);
+        jdbcTemplate.execute(insertUnderling);
+        String selectUnderlings = "select ID, position from employee " +
+                " join underlings on ID = id_underling where id_superior = " + (maxId + 1);
+        RowMapper<Underling> rowMapper = new BeanPropertyRowMapper<Underling>(Underling.class);
+        List<Underling> underlings =  this.jdbcTemplate.query(selectUnderlings, rowMapper);
+        ResponseEntity<String> raspuns = null;
+        List <UnderlingData> myUnderlings= new ArrayList<UnderlingData>();
+        String url = "http://104.199.20.255:8100/profile/get-profile/" + maxId;
+        raspuns=new RestTemplate().getForEntity(url, String.class);
+        try {
+            JSONArray obj = new JSONArray(raspuns.toString().substring(5));
+            JSONArray obj2 = obj.getJSONArray(1);
+            JSONObject obj1  = obj.optJSONObject(0);
+            JSONObject profile = obj2.optJSONObject(0);
+            if (profile != null){
+                String email = profile.getString("email");
+                myUnderlings.add(new UnderlingData(underlings.get(0), email));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        assertEquals(new Response1(new Response(1, "success", HttpStatus.OK), myUnderlings),
+                employeeService.getProfileUnderlings(underlings));
+        String deleteUnderling = "delete from underlings where id_superior = " + (maxId + 1);
+        String deleteEmployee = "delete from employee where id = " + (maxId + 1);
+        jdbcTemplate.execute(deleteUnderling);
+        jdbcTemplate.execute(deleteEmployee);
     }
 }

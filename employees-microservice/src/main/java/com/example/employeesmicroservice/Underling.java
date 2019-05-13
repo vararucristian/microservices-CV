@@ -36,4 +36,12 @@ public class Underling {
                 ",\n\t\"position\": \"" + position + "\"" +
                 "\n}";
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (!(obj instanceof Underling)) return false;
+        Underling comp = (Underling) obj;
+        return (comp.ID == ID && comp.position.equals(position));
+    }
 }

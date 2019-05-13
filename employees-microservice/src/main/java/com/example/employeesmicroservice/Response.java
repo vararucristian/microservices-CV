@@ -50,6 +50,6 @@ public class Response {
         if (obj == null) return false;
         if (!(obj instanceof Response)) return false;
         Response comp = (Response) obj;
-        return (comp.exitCode == exitCode && message.equals(comp.message) && comp.status == status);
+        return (comp.exitCode == exitCode && comp.message.equals(message) && comp.status == status);
     }
 }

@@ -23,4 +23,14 @@ public class Response1 {
                 ",\n\t{ \"underlings\" : "  + underlings  +
                 "\n}]";
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (!(obj instanceof Response1)) return false;
+        Response1 comp = (Response1) obj;
+        if(comp.underlings == null && underlings == null)
+            return (comp.response.equals(response) && comp.underlings == underlings);
+        else return (comp.response.equals(response) && comp.underlings.equals(underlings));
+    }
 }
