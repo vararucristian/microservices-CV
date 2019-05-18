@@ -168,5 +168,20 @@ public class EmployeeService {
                 }
             }
         }
+    public ResponsePosition getPosition(int userID)  {
+        if (!verifyId(userID)) {
+            Response response = new Response(0, "The employee with id "
+                    + userID + " does not exist.", HttpStatus.NOT_FOUND);
+            ResponsePosition responsePosition = new ResponsePosition(response, null);
+            return responsePosition;
+        } else {
+                String selectPosition = "select  position from employee where ID= "+ userID;
+                String position = jdbcTemplate.queryForObject(selectPosition, String.class) ;
+                Response response = new Response(1, "Succes.", HttpStatus.OK);
+                ResponsePosition responsePosition = new ResponsePosition(response, position);
+                return responsePosition;
+            }
+        }
     }
+
 

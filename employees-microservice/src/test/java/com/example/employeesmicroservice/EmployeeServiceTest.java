@@ -39,7 +39,7 @@ public class EmployeeServiceTest {
         jdbcTemplate.execute(insert);
         assertTrue(employeeService.verifyId(maxId));
         String delete = "delete from employee where id = " + maxId;
-        jdbcTemplate.execute(delete);
+        jdbcTemplate.execute(delete); 
         assertFalse(employeeService.verifyId(maxId));
     }
 

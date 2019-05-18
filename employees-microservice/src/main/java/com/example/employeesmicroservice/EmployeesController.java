@@ -100,5 +100,20 @@ public class EmployeesController {
         Response1 response1 = employeeService.viewUnderlings(userID);
         return new ResponseEntity<String>(response1.toString(), responseHeaders, response1.getResponse().getStatus());
     }
+    @RequestMapping("/get-position/{userID}")
+    public ResponseEntity<String> getPosition(@PathVariable("userID") int userID) {
+        URI location = null;
+        try {
+            location = new URI("localhost");
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.setLocation(location);
+        responseHeaders.set("MyResponseHeader", "MyValue");
+        //EmployeeService employeeService = new EmployeeService();
+        ResponsePosition responsePosition = employeeService.getPosition(userID);
+        return new ResponseEntity<String>(responsePosition.toString(), responseHeaders, responsePosition.getResponse().getStatus());
+    }
 }
 
