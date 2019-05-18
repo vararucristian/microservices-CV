@@ -115,5 +115,21 @@ public class EmployeesController {
         ResponsePosition responsePosition = employeeService.getPosition(userID);
         return new ResponseEntity<String>(responsePosition.toString(), responseHeaders, responsePosition.getResponse().getStatus());
     }
+
+    @RequestMapping("/get-employees")
+    public ResponseEntity<String> getEmployees(){
+        URI location = null;
+        try {
+            location = new URI("localhost");
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.setLocation(location);
+        responseHeaders.set("MyResponseHeader", "MyValue");
+        EmployeeResponse responseEmployees = employeeService.getEmployees();
+        return new ResponseEntity<String>(responseEmployees.toString(), responseHeaders,
+                responseEmployees.getResponse().getStatus());
+    }
 }
 

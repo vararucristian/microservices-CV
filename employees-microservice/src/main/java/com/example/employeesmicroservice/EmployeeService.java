@@ -12,12 +12,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import sun.net.www.http.HttpClient;
 
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -182,6 +177,14 @@ public class EmployeeService {
                 return responsePosition;
             }
         }
+
+    public EmployeeResponse getEmployees(){
+        String select = "select ID from employee";
+        List<Integer> ids =  jdbcTemplate.queryForList(select, Integer.class);
+        Response response = new Response(1, "success", HttpStatus.OK);
+        EmployeeResponse responseEmployee = new EmployeeResponse(response, ids);
+        return responseEmployee;
     }
+}
 
 
