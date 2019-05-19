@@ -72,6 +72,32 @@ public class ProfileCollector
             }
         }
     }
+    
+    @RequestMapping("/get-all-profiles")
+    public ResponseEntity<String> getAllProfiles() {
+        URI location = null;
+        try
+        {
+            location = new URI("localhost");
+        }
+        catch (URISyntaxException e)
+        {
+            e.printStackTrace();
+        }
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.setLocation(location);
+        responseHeaders.set("MyResponseHeader", "MyValue");
+
+
+
+        String selectPref = "select * from MS_USER order by id";
+        RowMapper<Profile> rowMapper = new BeanPropertyRowMapper<Profile>(Profile.class);
+        Response response = new Response(1, "success");
+        Response2 response1 =
+                new Response2(response, this.jdbcTemplate.query(selectPref, rowMapper));
+        return new ResponseEntity<String>(response1.toString(), responseHeaders, HttpStatus.OK);
+
+    }
 
     @RequestMapping("/delete-profile/{userID}")
     public ResponseEntity<String> deleteProfile(@PathVariable("userID") int userID) {
