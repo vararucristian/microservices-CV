@@ -44,30 +44,40 @@ public class EmployeeServiceTest {
     }
 
     @Test
-    public void verifyPositionTest(){
+    public void verifyPositionTestOk(){
         String selectMaxId = "select max(id) from employee";
-        int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) + 1;
-        String insertTrue = "insert into employee values(" + maxId + ", \'human resources\')";
-        String insertFalse = "insert into employee values(" + (maxId + 1) + ", \'position\')";
+        int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
+        String insertTrue = "insert into employee values(" +( maxId +1)+ ", \'human resources\')";
         jdbcTemplate.execute(insertTrue);
-        jdbcTemplate.execute(insertFalse);
-        assertEquals(employeeService.verifyPosition(maxId), new Response(1, "Succes", HttpStatus.OK));
-        assertEquals(employeeService.verifyPosition(maxId + 1), new Response(0, "The employee with  id "
-                + (maxId + 1) + " is not allowed to make changes.", HttpStatus.METHOD_NOT_ALLOWED));
-        assertEquals(employeeService.verifyPosition(maxId + 2 ), new Response(0, "The id "
-                + (maxId + 2) + " does not exist.", HttpStatus.NOT_FOUND));
-        String delete = "delete from employee where id = " + maxId + " or id = " + (maxId + 1);
+        assertEquals(employeeService.verifyPosition(maxId+1), new Response(1, "Succes", HttpStatus.OK));
+        String delete = "delete from employee where id = " + (maxId + 1);
         jdbcTemplate.execute(delete);
     }
 
     @Test
-    public void addUnderlingTest (){
+    public void verifyPositionTestMethodNotAllowed(){
         String selectMaxId = "select max(id) from employee";
         int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
-        assertEquals( new Response(0, "The superior with id " + (maxId+1 ) + " does not exist.", HttpStatus.NOT_FOUND),
-                employeeService.addUnderling(maxId + 2  , maxId+1, "position"));
-        assertEquals( new Response(0, "This employee id already exists.", HttpStatus.BAD_REQUEST),
-                employeeService.addUnderling(maxId  , maxId, "position"));
+        String insertFalse = "insert into employee values(" + (maxId + 1) + ", \'position\')";
+        jdbcTemplate.execute(insertFalse);
+        assertEquals(employeeService.verifyPosition(maxId + 1), new Response(0, "The employee with  id "
+                + (maxId + 1) + " is not allowed to make changes.", HttpStatus.METHOD_NOT_ALLOWED));
+        String delete = "delete from employee where id = " + (maxId + 1);
+        jdbcTemplate.execute(delete);
+    }
+
+    @Test
+    public void verifyPositionTestNotFound(){
+        String selectMaxId = "select max(id) from employee";
+        int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
+        assertEquals(employeeService.verifyPosition(maxId +1  ), new Response(0, "The id "
+                + (maxId + 1) + " does not exist.", HttpStatus.NOT_FOUND));
+    }
+
+    @Test
+    public void addUnderlingTestOk (){
+        String selectMaxId = "select max(id) from employee";
+        int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
         assertEquals( new Response(1, "Succes", HttpStatus.OK),
                 employeeService.addUnderling(maxId + 1 , maxId, "position"));
         String deleteEmployee = "delete from employee where id = " + (maxId+1);
@@ -77,22 +87,29 @@ public class EmployeeServiceTest {
     }
 
     @Test
-    public void changeSuperiorTest(){
+    public void addUnderlingTestNotFound (){
+        String selectMaxId = "select max(id) from employee";
+        int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
+        assertEquals( new Response(0, "The superior with id " + (maxId+1 ) + " does not exist.", HttpStatus.NOT_FOUND),
+                employeeService.addUnderling(maxId + 2  , maxId+1, "position"));
+    }
+
+    @Test
+    public void addUnderlingTestBadRequest (){
+        String selectMaxId = "select max(id) from employee";
+        int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
+        assertEquals( new Response(0, "This employee id already exists.", HttpStatus.BAD_REQUEST),
+                employeeService.addUnderling(maxId  , maxId, "position"));
+    }
+
+    @Test
+    public void changeSuperiorTestOK(){
         String selectMaxId = "select max(id_superior) from underlings";
         String selectMinId ="select min(id_underling) from underlings";
-        String selectMaxIdEmployee = "select max(id) from employee";
-        String selectMinIdEmployee ="select min(id) from employee";
         // se mai poate verifica daca max chiar e seful lui min
         int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
         int minId = jdbcTemplate.queryForObject(selectMinId, Integer.class);
-        int maxIdEmployee = jdbcTemplate.queryForObject(selectMaxIdEmployee, Integer.class) ;
-        int minIdEmployee = jdbcTemplate.queryForObject(selectMinIdEmployee, Integer.class);
-        String selectRealSuperior ="select id_superior from underlings where id_underling="+ minId;
         int RealSuperiorId = jdbcTemplate.queryForObject(selectMinId, Integer.class);
-        assertEquals(new Response(0, "The employee with id " + (minIdEmployee-1) + " does not exist.", HttpStatus.NOT_FOUND),
-                employeeService.changeSuperior(minIdEmployee-1, maxId));
-        assertEquals(new Response(0, "The superior with id " + (maxIdEmployee+1) + " does not exist.", HttpStatus.NOT_FOUND),
-                employeeService.changeSuperior(maxId, maxIdEmployee+1));
         assertEquals(new Response(1, "Succes", HttpStatus.OK), employeeService.changeSuperior(minId, maxId));
         String delete = "delete from underlings where id_superior =" + maxId+ " and id_underling="+ minId;
         jdbcTemplate.execute(delete);
@@ -101,18 +118,43 @@ public class EmployeeServiceTest {
     }
 
     @Test
-    public void removeUnderlingTest(){
+    public void changeSuperiorTestNotFoundEmployee(){
+        String selectMaxId = "select max(id_superior) from underlings";
+        String selectMinIdEmployee ="select min(id) from employee";
+        int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
+        int minIdEmployee = jdbcTemplate.queryForObject(selectMinIdEmployee, Integer.class);
+        assertEquals(new Response(0, "The employee with id " + (minIdEmployee-1) + " does not exist.", HttpStatus.NOT_FOUND),
+                employeeService.changeSuperior(minIdEmployee-1, maxId));
+    }
+
+    @Test
+    public void changeSuperiorTestNotFoundSuperior(){
+        String selectMaxId = "select max(id_superior) from underlings";
+        String selectMaxIdEmployee = "select max(id) from employee";
+        int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
+        int maxIdEmployee = jdbcTemplate.queryForObject(selectMaxIdEmployee, Integer.class) ;
+        assertEquals(new Response(0, "The superior with id " + (maxIdEmployee+1) + " does not exist.", HttpStatus.NOT_FOUND),
+                employeeService.changeSuperior(maxId, maxIdEmployee+1));
+    }
+
+    @Test
+    public void removeUnderlingTestNotFound(){
         String selectMaxId = "select max(id) from employee";
         int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
         assertEquals(new Response(0, "The employee with id " + (maxId+1) + " does not exist.", HttpStatus.NOT_FOUND),
                 employeeService.removeUnderling(maxId+1));
+    }
+
+    @Test
+    public void removeUnderlingTestOk(){
+        String selectMaxId = "select max(id) from employee";
+        int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
         String insertEmployee = "insert into employee values(" + (maxId+1) + ", \'position\')";
         String insertUnderling = "insert into underlings values(" + (maxId) + ","+ (maxId+1)+")";
         jdbcTemplate.execute(insertEmployee);
         jdbcTemplate.execute(insertUnderling);
         assertEquals(new Response(1, "Succes.", HttpStatus.OK),
                 employeeService.removeUnderling(maxId+1));
-
     }
 
     @Test
@@ -130,6 +172,7 @@ public class EmployeeServiceTest {
         String deleteSuperior = "delete from employee where id = " + (maxId + 1);
         jdbcTemplate.execute(deleteSuperior);
     }
+
 
     @Test
     public void getProfileUnderlingErrorTest() {
