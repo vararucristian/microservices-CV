@@ -32,7 +32,6 @@ public class EmployeesController {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setLocation(location);
         responseHeaders.set("MyResponseHeader", "MyValue");
-       // EmployeeService employeeService = new EmployeeService();
         Response response = employeeService.verifyPosition(idEmployee);
         return new ResponseEntity<String>(response.toString(), responseHeaders, response.getStatus());
     }
@@ -48,7 +47,6 @@ public class EmployeesController {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setLocation(location);
         responseHeaders.set("MyResponseHeader", "MyValue");
-        //EmployeeService employeeService = new EmployeeService();
         Response response = employeeService.addUnderling(idUnderling, idSuperior, position);
         return new ResponseEntity<String>(response.toString(), responseHeaders, response.getStatus());
     }
@@ -64,7 +62,6 @@ public class EmployeesController {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setLocation(location);
         responseHeaders.set("MyResponseHeader", "MyValue");
-        //EmployeeService employeeService = new EmployeeService();
         Response response = employeeService.changeSuperior(idUnderling, idSuperior);
         return new ResponseEntity<String>(response.toString(), responseHeaders, response.getStatus());
     }
@@ -80,7 +77,6 @@ public class EmployeesController {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setLocation(location);
         responseHeaders.set("MyResponseHeader", "MyValue");
-        //EmployeeService employeeService = new EmployeeService();
         Response response = employeeService.removeUnderling(idUnderling);
         return new ResponseEntity<String>(response.toString(), responseHeaders, response.getStatus());
     }
@@ -111,7 +107,6 @@ public class EmployeesController {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setLocation(location);
         responseHeaders.set("MyResponseHeader", "MyValue");
-        //EmployeeService employeeService = new EmployeeService();
         ResponsePosition responsePosition = employeeService.getPosition(userID);
         return new ResponseEntity<String>(responsePosition.toString(), responseHeaders, responsePosition.getResponse().getStatus());
     }
@@ -130,6 +125,20 @@ public class EmployeesController {
         EmployeeResponse responseEmployees = employeeService.getEmployees();
         return new ResponseEntity<String>(responseEmployees.toString(), responseHeaders,
                 responseEmployees.getResponse().getStatus());
+    }
+    @RequestMapping("/change-position/{idEmployee}/{position}")
+    private ResponseEntity changePositiom(@PathVariable("idEmployee") int idEmployee,@PathVariable("position") String position){
+        URI location = null;
+        try {
+            location = new URI("localhost");
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.setLocation(location);
+        responseHeaders.set("MyResponseHeader", "MyValue");
+        Response response = employeeService.changePosition(idEmployee,position);
+        return new ResponseEntity<String>(response.toString(), responseHeaders, response.getStatus());
     }
 }
 

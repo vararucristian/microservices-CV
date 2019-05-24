@@ -110,14 +110,14 @@ public class EmployeeService {
         }
     }
 
-    public Response1 getProfileUnderlings(List<Underling> underlings){
-        List <UnderlingData> myUnderlings= new ArrayList<UnderlingData>();
-        for (Underling underling: underlings) {
+    public Response1 getProfileUnderlings(List<Underling> underlings) {
+        List<UnderlingData> myUnderlings = new ArrayList<UnderlingData>();
+        for (Underling underling : underlings) {
             ResponseEntity<String> raspuns = null;
             String url = "http://104.199.20.255:8100/profile/get-profile/" + underling.getID();
-            try{
-                raspuns=new RestTemplate().getForEntity(url, String.class);
-            }catch(HttpClientErrorException e){
+            try {
+                raspuns = new RestTemplate().getForEntity(url, String.class);
+            } catch (HttpClientErrorException e) {
                 Response response = new Response(0, "The underling with id "
                         + underling.getID() + " do not have a profile. ", HttpStatus.NOT_FOUND);
                 Response1 response1 = new Response1(response, null);
@@ -126,21 +126,22 @@ public class EmployeeService {
             try {
                 JSONArray obj = new JSONArray(raspuns.toString().substring(5));
                 JSONArray obj2 = obj.getJSONArray(1);
-                JSONObject obj1  = obj.optJSONObject(0);
+                JSONObject obj1 = obj.optJSONObject(0);
                 JSONObject profile = obj2.optJSONObject(0);
-                if (profile != null){
+                if (profile != null) {
                     String email = profile.getString("email");
                     myUnderlings.add(new UnderlingData(underling, email));
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
-            }}
+            }
+        }
         Response response = new Response(1, "success", HttpStatus.OK);
         Response1 response1 = new Response1(response, myUnderlings);
         return response1;
     }
 
-    public Response1 viewUnderlings(int userID)  {
+    public Response1 viewUnderlings(int userID) {
         if (!verifyId(userID)) {
             Response response = new Response(0, "The employee with id "
                     + userID + " does not exist.", HttpStatus.NOT_FOUND);
@@ -158,33 +159,47 @@ public class EmployeeService {
                 String selectUnderlings = "select ID, position from employee " +
                         " join underlings on ID = id_underling where id_superior = " + userID;
                 RowMapper<Underling> rowMapper = new BeanPropertyRowMapper<Underling>(Underling.class);
-                List<Underling> underlings =  this.jdbcTemplate.query(selectUnderlings, rowMapper);
+                List<Underling> underlings = this.jdbcTemplate.query(selectUnderlings, rowMapper);
                 return getProfileUnderlings(underlings);
-                }
             }
         }
-    public ResponsePosition getPosition(int userID)  {
+    }
+
+    public ResponsePosition getPosition(int userID) {
         if (!verifyId(userID)) {
             Response response = new Response(0, "The employee with id "
                     + userID + " does not exist.", HttpStatus.NOT_FOUND);
             ResponsePosition responsePosition = new ResponsePosition(response, null);
             return responsePosition;
         } else {
-                String selectPosition = "select  position from employee where ID= "+ userID;
-                String position = jdbcTemplate.queryForObject(selectPosition, String.class) ;
-                Response response = new Response(1, "Succes.", HttpStatus.OK);
-                ResponsePosition responsePosition = new ResponsePosition(response, position);
-                return responsePosition;
-            }
+            String selectPosition = "select  position from employee where ID= " + userID;
+            String position = jdbcTemplate.queryForObject(selectPosition, String.class);
+            Response response = new Response(1, "Succes.", HttpStatus.OK);
+            ResponsePosition responsePosition = new ResponsePosition(response, position);
+            return responsePosition;
         }
+    }
 
-    public EmployeeResponse getEmployees(){
+    public EmployeeResponse getEmployees() {
         String select = "select ID from employee";
-        List<Integer> ids =  jdbcTemplate.queryForList(select, Integer.class);
+        List<Integer> ids = jdbcTemplate.queryForList(select, Integer.class);
         Response response = new Response(1, "success", HttpStatus.OK);
         EmployeeResponse responseEmployee = new EmployeeResponse(response, ids);
         return responseEmployee;
     }
-}
 
+    public Response changePosition(int idEmployee, String position) {
+        if (!verifyId(idEmployee)) {
+            Response response = new Response(0, "The employee with id " +
+                    idEmployee + " does not exist.", HttpStatus.NOT_FOUND);
+            return response;
+        }
+        String updatePosition = "update employee set position=' " + position + "' where id=" + idEmployee + ";";
+        jdbcTemplate.execute(updatePosition);
+        Response response = new Response(1, "Succes.", HttpStatus.OK);
+        return response;
+
+
+    }
+}
 

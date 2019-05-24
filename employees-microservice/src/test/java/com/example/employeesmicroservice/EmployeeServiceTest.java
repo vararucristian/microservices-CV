@@ -49,7 +49,7 @@ public class EmployeeServiceTest {
         int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
         String insertTrue = "insert into employee values(" +( maxId +1)+ ", \'human resources\')";
         jdbcTemplate.execute(insertTrue);
-        assertEquals(employeeService.verifyPosition(maxId+1), new Response(1, "Succes", HttpStatus.OK));
+        assertEquals( new Response(1, "Succes", HttpStatus.OK),employeeService.verifyPosition(maxId+1));
         String delete = "delete from employee where id = " + (maxId + 1);
         jdbcTemplate.execute(delete);
     }
@@ -60,8 +60,9 @@ public class EmployeeServiceTest {
         int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
         String insertFalse = "insert into employee values(" + (maxId + 1) + ", \'position\')";
         jdbcTemplate.execute(insertFalse);
-        assertEquals(employeeService.verifyPosition(maxId + 1), new Response(0, "The employee with  id "
-                + (maxId + 1) + " is not allowed to make changes.", HttpStatus.METHOD_NOT_ALLOWED));
+        assertEquals( new Response(0, "The employee with  id "
+                + (maxId + 1) + " is not allowed to make changes.", HttpStatus.METHOD_NOT_ALLOWED),
+                employeeService.verifyPosition(maxId + 1));
         String delete = "delete from employee where id = " + (maxId + 1);
         jdbcTemplate.execute(delete);
     }
@@ -70,8 +71,8 @@ public class EmployeeServiceTest {
     public void verifyPositionTestNotFound(){
         String selectMaxId = "select max(id) from employee";
         int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
-        assertEquals(employeeService.verifyPosition(maxId +1  ), new Response(0, "The id "
-                + (maxId + 1) + " does not exist.", HttpStatus.NOT_FOUND));
+        assertEquals( new Response(0, "The id " + (maxId + 1) + " does not exist.", HttpStatus.NOT_FOUND),
+                employeeService.verifyPosition(maxId +1  ));
     }
 
     @Test
@@ -155,6 +156,47 @@ public class EmployeeServiceTest {
         jdbcTemplate.execute(insertUnderling);
         assertEquals(new Response(1, "Succes.", HttpStatus.OK),
                 employeeService.removeUnderling(maxId+1));
+    }
+
+    @Test
+    public void getPositionTestNotFound(){
+        String selectMaxId = "select max(id) from employee";
+        int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
+        Response response = new Response(0, "The employee with id "
+                + (maxId+1) + " does not exist.", HttpStatus.NOT_FOUND);
+        assertEquals(new ResponsePosition(response, null), employeeService.getPosition(maxId+1));
+    }
+
+    @Test
+    public void getPositionTestOk(){
+        String selectMaxId = "select max(id) from employee";
+        int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
+        String insertEmployee = "insert into employee values(" + (maxId+1) + ", \'position\')";
+        jdbcTemplate.execute(insertEmployee);
+        Response response = new Response(1, "Succes.", HttpStatus.OK);
+        assertEquals(new ResponsePosition(response, "position"), employeeService.getPosition(maxId+1));
+        String deleteEmployee = "delete from employee where id = " + (maxId+1);
+        jdbcTemplate.execute(deleteEmployee);
+    }
+
+    @Test
+    public void changePositionTestNotFound(){
+        String selectMaxId = "select max(id) from employee";
+        int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
+        assertEquals(new Response(0, "The employee with id " + (maxId+1) + " does not exist.", HttpStatus.NOT_FOUND),
+                employeeService.changePosition(maxId+1, "position"));
+    }
+
+    @Test
+    public void changePositionTestOk (){
+        String selectMaxId = "select max(id) from employee";
+        int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
+        String insertTrue = "insert into employee values(" +( maxId +1)+ ", \'position\')";
+        jdbcTemplate.execute(insertTrue);
+        assertEquals( new Response(1, "Succes.", HttpStatus.OK),
+                employeeService.changePosition(maxId+1,"new position"));
+        String delete = "delete from employee where id = " + (maxId + 1);
+        jdbcTemplate.execute(delete);
     }
 
     @Test
