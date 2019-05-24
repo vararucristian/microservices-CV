@@ -16,6 +16,10 @@ public class Response1 {
         return response;
     }
 
+    public List<UnderlingData> getUnderlings() {
+        return underlings;
+    }
+
     @Override
     public String toString() {
         return "[\n" +

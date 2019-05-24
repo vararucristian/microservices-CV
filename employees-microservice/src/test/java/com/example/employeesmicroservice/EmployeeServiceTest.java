@@ -230,4 +230,14 @@ public class EmployeeServiceTest {
         jdbcTemplate.execute(deleteUnderling);
         jdbcTemplate.execute(deleteEmployee);
     }
+
+    @Test
+    public void getEmployeesTest(){
+        String select = "select ID from employee";
+        List<Integer> ids =  jdbcTemplate.queryForList(select, Integer.class);
+        Response response = new Response(1, "success", HttpStatus.OK);
+        EmployeeResponse employeeResponse = employeeService.getEmployees();
+        assertEquals(response, employeeResponse.getResponse());
+        assertEquals(ids, employeeResponse.getID());
+    }
 }
