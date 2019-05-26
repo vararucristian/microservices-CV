@@ -50,18 +50,14 @@ public class EmployeesControllerTest {
 
 
     @Test
-    public void verifyPositionTest(){
+    public void verifyPositionTest() throws Exception {
 
         given(employeeService.verifyPosition(1)).willReturn(response);
-        try {
             mockMvc.perform(get("/employees/try-get/1")
                     .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$[0].exitCode", CoreMatchers.is(response.getExitCode())))
                     .andExpect(jsonPath("$[0].message", CoreMatchers.is(response.getMessage())));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Test

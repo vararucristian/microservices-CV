@@ -32,14 +32,20 @@ public class EmployeeServiceTest {
     JdbcTemplate jdbcTemplate;
 
     @Test
-    public void verifyIdTest(){
+    public void verifyIdTestTrue(){
         String selectMaxId = "select max(id) from employee";
         int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) + 1;
         String insert = "insert into employee values(" + maxId + ", \'position\')";
         jdbcTemplate.execute(insert);
         assertTrue(employeeService.verifyId(maxId));
         String delete = "delete from employee where id = " + maxId;
-        jdbcTemplate.execute(delete); 
+        jdbcTemplate.execute(delete);
+    }
+
+    @Test
+    public void verifyIdTestFalse() {
+        String selectMaxId = "select max(id) from employee";
+        int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) + 1;
         assertFalse(employeeService.verifyId(maxId));
     }
 
@@ -200,14 +206,21 @@ public class EmployeeServiceTest {
     }
 
     @Test
-    public void viewUnderlingsTest() {
+    public void viewUnderlingsTestNotFound() {
+        String selectMaxId = "select max(id) from employee";
+        int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
+        assertEquals(new Response1(new Response(0, "The employee with id "
+                        + (maxId + 1) + " does not exist.", HttpStatus.NOT_FOUND), null),
+                employeeService.viewUnderlings(maxId + 1));
+    }
+
+
+    @Test
+    public void viewUnderlingsTestBadRequest() {
         String selectMaxId = "select max(id) from employee";
         int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class) ;
         String insertSuperior = "insert into employee values(" + (maxId + 1) + ", \'position\')";
         jdbcTemplate.execute(insertSuperior);
-        assertEquals(new Response1(new Response(0, "The employee with id "
-                        + (maxId + 2) + " does not exist.", HttpStatus.NOT_FOUND), null),
-                employeeService.viewUnderlings(maxId + 2));
         assertEquals(new Response1(new Response(0, "The employee with id "
                         + (maxId + 1) + " has not underlings", HttpStatus.BAD_REQUEST), null),
                 employeeService.viewUnderlings(maxId + 1));
@@ -238,7 +251,7 @@ public class EmployeeServiceTest {
     }
 
     @Test
-    public void getProfileUnderlingsCorrectTest() {
+    public void getProfileUnderlingsTestOk() {
         String selectMaxId = "select max(id) from employee";
         int maxId = jdbcTemplate.queryForObject(selectMaxId, Integer.class);
         String insertEmployee = "insert into employee values(" + (maxId + 1) + ", \'position\')";
